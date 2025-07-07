@@ -100,5 +100,5 @@ Project: Customer Churn Prediction with Explainability
 ## 📬 Contact
 
 Feel free to connect:  
-[LinkedIn](https://www.linkedin.com/in/mrunal-gaikwad) | [GitHub](https://github.com/mrunalgaikwad2364/Customer_Churn_Prediction)  
+[LinkedIn](https://www.linkedin.com/in/mrunal-gaikwad-328273300) | [GitHub](https://github.com/mrunalgaikwad2364/Customer_Churn_Prediction)  
     
