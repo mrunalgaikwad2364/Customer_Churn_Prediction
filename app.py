@@ -11,10 +11,10 @@ import os
 model = pickle.load(open("xgb_model.pkl", "rb"))
 
 # Page Config
-st.set_page_config(page_title="Bank Churn Prediction System", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Customer Churn Prediction System", layout="wide", initial_sidebar_state="expanded")
 
 # Sidebar - Customer Info
-st.sidebar.header("Customer Information")
+st.sidebar.header("🧾 Customer Information")
 
 credit_score = st.sidebar.slider("Credit Score", 300, 900, 650)
 gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
@@ -42,16 +42,16 @@ input_df = pd.DataFrame(input_data, columns=[
 ])
 
 # Main Title
-st.title("🏦 Bank Churn Prediction System")
+st.title("🏦 Customer Churn Prediction System")
 st.markdown(" 👋 Welcome!")
 st.markdown("Fill in the customer details on the left panel and click the button below to check if the customer is likely to churn.")
 
 # Predict Button
-if st.sidebar.button("Predict Churn"):
+if st.sidebar.button("🚀 Predict Churn"):
     prediction = model.predict(input_df)[0]
-    prob = model.predict_proba(input_df)[0][1] * 100  # Percentage
+    prob = model.predict_proba(input_df)[0][1] * 100
 
-    st.markdown("---")    
+    st.markdown("---")
     st.subheader("🔍 Prediction Result")
 
     if prob < 20:
@@ -61,12 +61,10 @@ if st.sidebar.button("Predict Churn"):
 
     st.markdown("---")
 
-    # Layout for Profile Comparison & Risk Factors & Recommendations
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("👤 Customer Profile Comparison")
-
         averages = {
             'CreditScore': 650,
             'Age': 40,
@@ -110,14 +108,21 @@ if st.sidebar.button("Predict Churn"):
             st.success("No major risk factors identified.")
 
         st.subheader("💡 Recommendations")
-        st.write("- Continue regular engagement with the customer")
-        st.write("- Offer product upgrades")
-        st.write("- Maintain service quality")
-        st.write("- Monitor for any changes")
+        if risk_factors:
+            if "Age above 50" in risk_factors:
+                st.write("- Offer senior benefits or personalized retirement plans.")
+            if "Inactive Member" in risk_factors:
+                st.write("- Engage customer with loyalty rewards or better services.")
+            if "Only one product" in risk_factors:
+                st.write("- Cross-sell more banking products like loans or insurance.")
+        else:
+            st.write("- Continue regular engagement with the customer")
+            st.write("- Offer product upgrades")
+            st.write("- Maintain service quality")
+            st.write("- Monitor for any changes")
 
     st.markdown("---")
 
-    # Churn Probability Gauge (Smaller Size)
     st.subheader("📊 Churn Probability Gauge")
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number",
@@ -133,7 +138,6 @@ if st.sidebar.button("Predict Churn"):
     fig_gauge.update_layout(height=300)
     st.plotly_chart(fig_gauge, use_container_width=True)
 
-    # SHAP Explainability (Smaller)
     st.subheader("🔬 SHAP Explainability")
     explainer = shap.Explainer(model)
     shap_values = explainer(input_df)
@@ -141,24 +145,23 @@ if st.sidebar.button("Predict Churn"):
     shap.plots.force(shap_values[0], matplotlib=True, show=False)
     st.pyplot(plt.gcf())
 
-    # Downloadable Report
-    st.subheader("📥 Download Prediction Report")
-
+    st.subheader("📅 Download Prediction Report")
     geo = country
     report_data = {
-        "Credit Score": credit_score,
+        "CreditScore": credit_score,
         "Gender": gender,
         "Age": age,
         "Tenure": tenure,
         "Balance": balance,
-        "Number of Products": products,
-        "Has Credit Card": has_card,
-        "Is Active Member": is_active,
-        "Estimated Salary": salary,
+        "NumOfProducts": products,
+        "HasCrCard": has_card,
+        "IsActiveMember": is_active,
+        "EstimatedSalary": salary,
         "Geography": geo,
         "Prediction": "Churn" if prediction else "Stay",
-        "Probability": round(prob if prediction else 1 - prob, 2)
+        "Probability": round(prob if prediction else 100 - prob, 2)
     }
+
     report_df = pd.DataFrame([report_data])
     csv = report_df.to_csv(index=False).encode('utf-8')
 
@@ -169,13 +172,12 @@ if st.sidebar.button("Predict Churn"):
         mime='text/csv'
     )
 
-    # Save prediction to history
-    history_df = pd.DataFrame([report_data])
+    # Save to history
     try:
         existing = pd.read_csv("prediction_history.csv")
-        updated = pd.concat([existing, history_df], ignore_index=True)
+        updated = pd.concat([existing, report_df], ignore_index=True)
     except FileNotFoundError:
-        updated = history_df
+        updated = report_df
 
     updated.to_csv("prediction_history.csv", index=False)
     st.success("📄 Prediction saved to history!")
@@ -184,8 +186,16 @@ if st.sidebar.button("Predict Churn"):
 st.sidebar.markdown("---")
 if st.sidebar.button("View Prediction History"):
     if os.path.exists("prediction_history.csv"):
-        st.subheader("🗂️ Prediction History")
+        st.subheader("📂 Prediction History")
         history = pd.read_csv("prediction_history.csv")
+
+        # Clean history
+        history.dropna(inplace=True)
+        expected_cols = ['CreditScore', 'Gender', 'Age', 'Tenure', 'Balance',
+                         'NumOfProducts', 'HasCrCard', 'IsActiveMember', 'EstimatedSalary',
+                         'Geography', 'Prediction', 'Probability']
+        history = history[[col for col in expected_cols if col in history.columns]]
+
         st.dataframe(history)
     else:
         st.info("No prediction history available yet.")
