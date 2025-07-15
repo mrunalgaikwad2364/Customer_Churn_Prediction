@@ -43,14 +43,8 @@ input_df = pd.DataFrame(input_data, columns=[
 
 # Main Title
 st.title("🏦 Bank Churn Prediction System")
-st.write("This application helps predict customer churn probability using machine learning.")
-
-# Show key stats
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Retention Rate", "79.6%")
-col2.metric("Churn Rate", "20.4%")
-col3.metric("Total Customers", "10,000")
-col4.metric("Features Used", "11")
+st.markdown(" 👋 Welcome!")
+st.markdown("Fill in the customer details on the left panel and click the button below to check if the customer is likely to churn.")
 
 # Predict Button
 if st.sidebar.button("Predict Churn"):
