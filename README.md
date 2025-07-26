@@ -81,14 +81,6 @@ streamlit run app.py
 
 ---
 
-
-## 🧑‍💻 Developed For
-
-CodSoft Internship - Machine Learning Intern  
-Project: Customer Churn Prediction with Explainability  
-
----
-
 ## 🙌 Acknowledgements
 
 - Inspired by real-world churn prediction use-cases  
